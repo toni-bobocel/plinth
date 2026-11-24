@@ -2,5 +2,7 @@ packages:
   - apps/*
   - packages/*
 
+# protobufjs only runs a version banner on install.
 allowBuilds:
   esbuild: true
+  protobufjs: false

@@ -1,7 +1,9 @@
+import { trace } from '@opentelemetry/api'
 import { Hono } from 'hono'
 import { csrf } from 'hono/csrf'
 import { HTTPException } from 'hono/http-exception'
 import { requestId } from 'hono/request-id'
+import { routePath } from 'hono/route'
 import { secureHeaders } from 'hono/secure-headers'
 import type { AppEnv, Deps } from './context.js'
 import { auth } from './routes/auth.js'
@@ -16,10 +18,17 @@ export function createApp(deps: Deps) {
       c.set('deps', deps)
       const started = performance.now()
       await next()
+      // The http instrumentation only knows the raw URL; naming the span after
+      // the matched route keeps /orgs/acme and /orgs/globex in one series.
+      const route = routePath(c, -1)
+      trace
+        .getActiveSpan()
+        ?.updateName(`${c.req.method} ${route}`)
+        .setAttribute('http.route', route)
       deps.logger.info({
         req: c.var.requestId,
         method: c.req.method,
-        path: c.req.path,
+        route,
         status: c.res.status,
         ms: Math.round(performance.now() - started),
       })
