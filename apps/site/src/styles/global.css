@@ -1,0 +1,758 @@
+@import "@fontsource/marcellus/400.css";
+@import "@fontsource-variable/newsreader/opsz.css";
+@import "@fontsource-variable/newsreader/opsz-italic.css";
+@import "@fontsource-variable/martian-mono/wdth.css";
+
+:root {
+  --travertine: #e7e1d5;
+  --travertine-deep: #d9d1c1;
+  --basalt: #151412;
+  --basalt-soft: #3b3833;
+  --minium: #b5361c;
+  --patina: #4f7a69;
+  --hairline: rgb(21 20 18 / 0.16);
+
+  --inscription: "Marcellus", serif;
+  --prose: "Newsreader Variable", serif;
+  --mono: "Martian Mono Variable", ui-monospace, monospace;
+
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--travertine);
+  color: var(--basalt);
+  font-family: var(--prose);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+/* Stone: a fixed grain plus two slow veins of warmer and cooler limestone. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+body::before {
+  background:
+    radial-gradient(120vw 60vh at 10% 15%, rgb(201 186 160 / 0.35), transparent 60%),
+    radial-gradient(90vw 50vh at 90% 80%, rgb(160 170 165 / 0.18), transparent 60%);
+  mix-blend-mode: multiply;
+  z-index: -1;
+}
+
+body::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .07 0 0 0 0 .06 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.32;
+  mix-blend-mode: multiply;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--minium);
+  color: var(--travertine);
+}
+
+.mono {
+  font-family: var(--mono);
+  font-variation-settings: "wdth" 85;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Letters cut into stone: dark upper-left wall, lit lower-right wall. */
+.carved {
+  font-family: var(--inscription);
+  color: var(--travertine-deep);
+  text-shadow:
+    -0.012em -0.012em 0 rgb(21 20 18 / 0.55),
+    0.01em 0.01em 0 rgb(255 255 255 / 0.85);
+}
+
+.rubric {
+  color: var(--minium);
+}
+
+.interpunct {
+  color: var(--minium);
+  padding-inline: 0.18em;
+}
+
+/* ───────── chrome ───────── */
+
+.masthead {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 1.1rem var(--gutter) 1.6rem;
+  background: linear-gradient(var(--travertine) 40%, rgb(231 225 213 / 0));
+}
+
+.masthead a {
+  text-decoration: none;
+}
+
+.masthead > :last-child {
+  justify-self: end;
+}
+
+.masthead .seal {
+  font-family: var(--inscription);
+  font-size: 0.95rem;
+  letter-spacing: 0.32em;
+}
+
+/* ───────── hero ───────── */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 1fr auto auto;
+  column-gap: 1.25rem;
+  padding: 6rem var(--gutter) 3rem;
+}
+
+.hero__word {
+  grid-column: 1 / -1;
+  align-self: end;
+  margin: 0;
+  font-size: clamp(5.5rem, 26.6vw, 30rem);
+  line-height: 0.78;
+  letter-spacing: 0.015em;
+  white-space: nowrap;
+}
+
+.hero__word .char {
+  position: relative;
+  display: inline-block;
+}
+
+.hero__inscription {
+  grid-column: 1 / -1;
+  margin: 2.4rem 0 3.2rem;
+  font-family: var(--inscription);
+  font-size: clamp(0.9rem, 1.55vw, 1.45rem);
+  letter-spacing: 0.24em;
+  border-block: 1px solid var(--hairline);
+  padding-block: 0.9rem;
+}
+
+.hero__lede {
+  grid-column: 1 / span 6;
+  margin: 0;
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  line-height: 1.3;
+  font-weight: 340;
+  max-width: 34ch;
+}
+
+.hero__lede em {
+  font-style: italic;
+  color: var(--minium);
+}
+
+.hero__meta {
+  grid-column: 9 / -1;
+  align-self: end;
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero__meta li {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 0.45rem;
+}
+
+.dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--basalt-soft);
+  pointer-events: none;
+}
+
+/* ───────── chapters ───────── */
+
+.chapter {
+  position: relative;
+  padding: 0 var(--gutter);
+}
+
+.chapter__head {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 1.25rem;
+  align-items: end;
+  padding-top: 8rem;
+  margin-bottom: 3rem;
+}
+
+.chapter__numeral {
+  grid-column: 1 / span 2;
+  font-size: clamp(3rem, 7vw, 7rem);
+  line-height: 0.8;
+}
+
+.chapter__title {
+  grid-column: 3 / span 7;
+  margin: 0;
+  font-family: var(--prose);
+  font-weight: 300;
+  font-size: clamp(2rem, 4.4vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.chapter__title em {
+  font-style: italic;
+  font-weight: 400;
+}
+
+.chapter__aside {
+  grid-column: 10 / -1;
+  margin: 0;
+  font-size: 1.02rem;
+  line-height: 1.45;
+  color: var(--basalt-soft);
+}
+
+/* ───────── I · the forgotten clause ───────── */
+
+.clause {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  min-height: 100svh;
+  align-content: center;
+}
+
+.terminal {
+  align-self: center;
+  border: 1px solid var(--basalt);
+  background: var(--basalt);
+  color: var(--travertine);
+  padding: 1.4rem 1.5rem 1.6rem;
+  font-family: var(--mono);
+  font-variation-settings: "wdth" 85;
+  font-size: clamp(0.72rem, 0.9vw, 0.86rem);
+  line-height: 1.85;
+}
+
+.terminal__label {
+  display: flex;
+  justify-content: space-between;
+  color: rgb(231 225 213 / 0.45);
+  margin-bottom: 1rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.terminal pre {
+  margin: 0;
+  font: inherit;
+  white-space: pre-wrap;
+}
+
+.terminal .k {
+  color: #d99a7f;
+}
+
+.terminal .s {
+  color: #9cc2b1;
+}
+
+.terminal .scope {
+  display: block;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgb(231 225 213 / 0.2);
+}
+
+.terminal .scope b {
+  color: #f0b39c;
+  font-weight: 500;
+}
+
+.tablet {
+  position: relative;
+  align-self: center;
+  border-top: 2px solid var(--basalt);
+}
+
+.tablet__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6rem 1fr auto;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.tablet__row .name {
+  font-family: var(--prose);
+  font-size: clamp(1.2rem, 1.9vw, 1.8rem);
+  font-weight: 330;
+}
+
+.tablet__strike {
+  position: absolute;
+  left: -1%;
+  top: 50%;
+  width: 102%;
+  height: 14px;
+  transform: translateY(-50%);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tablet__strike path {
+  fill: none;
+  stroke: var(--minium);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.tablet__count {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: 1.1rem;
+}
+
+.tablet__count strong {
+  font-family: var(--inscription);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 5vw, 4.6rem);
+  line-height: 1;
+}
+
+.verdict {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+  font-weight: 300;
+  font-style: italic;
+  text-align: center;
+  min-height: 1.4em;
+}
+
+/* ───────── II · strata ───────── */
+
+.strata {
+  position: relative;
+  height: 100svh;
+  /* Courses wait above the fold of this box, not over the chapter title. */
+  overflow: clip;
+  display: grid;
+  place-items: end center;
+  padding-bottom: 8vh;
+}
+
+.plinth {
+  position: relative;
+  width: min(92vw, 68rem);
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+}
+
+.course {
+  position: relative;
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  height: clamp(3.1rem, 7.2vh, 4.6rem);
+  padding: 0 clamp(1rem, 2.2vw, 2rem);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.35), transparent 30%),
+    linear-gradient(0deg, rgb(21 20 18 / 0.12), transparent 40%), var(--travertine-deep);
+  border: 1px solid rgb(21 20 18 / 0.28);
+  box-shadow: 0 18px 22px -18px rgb(21 20 18 / 0.45);
+}
+
+.course:nth-child(1) {
+  width: 100%;
+}
+.course:nth-child(2) {
+  width: 96%;
+}
+.course:nth-child(3) {
+  width: 92%;
+}
+.course:nth-child(4) {
+  width: 89%;
+}
+.course:nth-child(5) {
+  width: 86%;
+}
+.course:nth-child(6) {
+  width: 82%;
+}
+
+.course__numeral {
+  font-family: var(--inscription);
+  font-size: 1.35rem;
+  color: var(--minium);
+}
+
+.course__name {
+  font-family: var(--inscription);
+  font-size: clamp(1rem, 1.9vw, 1.6rem);
+  letter-spacing: 0.14em;
+}
+
+.course__detail {
+  color: var(--basalt-soft);
+}
+
+.shaft {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 78%;
+  height: 46vh;
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+.shaft {
+  /* Unfinished on purpose: the column fades out where the product begins. */
+  mask-image: linear-gradient(to top, #000 35%, transparent 95%);
+}
+
+.shaft path {
+  fill: none;
+  stroke: var(--basalt);
+  vector-effect: non-scaling-stroke;
+}
+
+.shaft__edge {
+  stroke-width: 1.4;
+}
+
+.shaft__flute {
+  stroke-width: 1;
+  opacity: 0.35;
+}
+
+.shaft__label {
+  position: absolute;
+  bottom: calc(100% + 18vh);
+  left: 50%;
+  transform: translateX(-50%);
+  font-style: italic;
+  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+  font-weight: 300;
+  white-space: nowrap;
+  padding: 0.1em 0.7em;
+  background: var(--travertine);
+}
+
+/* ───────── III · one request ───────── */
+
+.trace {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+}
+
+.trace__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 0.9rem;
+  border-bottom: 2px solid var(--basalt);
+}
+
+.trace__route {
+  font-family: var(--mono);
+  font-variation-settings: "wdth" 85;
+  font-size: clamp(0.9rem, 1.4vw, 1.2rem);
+}
+
+.trace__ruler {
+  position: relative;
+  height: 1.8rem;
+  margin-left: 34%;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.trace__ruler span {
+  position: absolute;
+  bottom: 0.4rem;
+  transform: translateX(-50%);
+  color: var(--basalt-soft);
+  white-space: nowrap;
+}
+
+.trace__ruler span:first-child {
+  transform: none;
+}
+
+.trace__ruler span:last-child {
+  transform: translateX(-100%);
+}
+
+.span {
+  display: grid;
+  grid-template-columns: 34% 1fr;
+  align-items: center;
+  height: 2.35rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.span__name {
+  display: flex;
+  gap: 0.6rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 1rem;
+}
+
+.span__name i {
+  font-style: normal;
+  color: var(--basalt-soft);
+}
+
+.span[data-depth="1"] .span__name {
+  padding-left: 1.4rem;
+}
+
+.span__track {
+  position: relative;
+  height: 100%;
+}
+
+.span__bar {
+  position: absolute;
+  top: 28%;
+  height: 44%;
+  background: var(--patina);
+  transform-origin: left center;
+}
+
+.span[data-kind="http"] .span__bar {
+  background: var(--basalt);
+}
+
+.span[data-kind="scope"] .span__bar {
+  background: var(--minium);
+}
+
+.span__ms {
+  position: absolute;
+  top: 50%;
+  transform: translate(0.5rem, -50%);
+  color: var(--basalt-soft);
+  white-space: nowrap;
+}
+
+.trace__log {
+  margin-top: 2.2rem;
+  padding: 1rem 1.2rem;
+  background: rgb(21 20 18 / 0.06);
+  font-family: var(--mono);
+  font-variation-settings: "wdth" 85;
+  font-size: 0.72rem;
+  line-height: 1.7;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.trace__log mark {
+  background: none;
+  color: var(--minium);
+  border-bottom: 1px solid currentColor;
+}
+
+/* ───────── IV · decisions ───────── */
+
+.decisions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 2px solid var(--basalt);
+}
+
+.decision a {
+  position: relative;
+  display: grid;
+  grid-template-columns: 2fr 7fr 3fr;
+  align-items: baseline;
+  gap: 1.25rem;
+  padding: 1.8rem 0;
+  border-bottom: 1px solid var(--hairline);
+  text-decoration: none;
+}
+
+.decision__numeral {
+  font-family: var(--inscription);
+  font-size: clamp(1.6rem, 2.6vw, 2.4rem);
+  color: var(--minium);
+}
+
+.decision__title {
+  font-size: clamp(1.4rem, 2.6vw, 2.4rem);
+  font-weight: 320;
+  line-height: 1.1;
+}
+
+.decision__gist {
+  color: var(--basalt-soft);
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.decision__rule {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 2px;
+  background: var(--minium);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+/* ───────── V · lay it ───────── */
+
+.quickstart {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: 1.25rem;
+  padding-bottom: 6rem;
+}
+
+.quickstart .terminal {
+  grid-column: 3 / span 8;
+}
+
+.colophon {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 1rem;
+  padding: 2rem var(--gutter) 2.4rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.colophon p {
+  margin: 0;
+}
+
+.colophon__mark {
+  font-family: var(--inscription);
+  font-size: 0.95rem;
+  letter-spacing: 0.32em;
+  text-align: center;
+}
+
+.colophon > :last-child {
+  text-align: right;
+}
+
+@media (max-width: 900px) {
+  .hero__lede,
+  .hero__meta {
+    grid-column: 1 / -1;
+  }
+
+  .hero__meta {
+    margin-top: 2rem;
+  }
+
+  .chapter__numeral {
+    grid-column: 1 / -1;
+    margin-bottom: 1rem;
+  }
+
+  .chapter__title,
+  .chapter__aside {
+    grid-column: 1 / -1;
+  }
+
+  .chapter__aside {
+    margin-top: 1.2rem;
+  }
+
+  .clause {
+    grid-template-columns: 1fr;
+  }
+
+  .course {
+    grid-template-columns: 2.2rem 1fr;
+  }
+
+  .course__detail {
+    display: none;
+  }
+
+  .span {
+    grid-template-columns: 44% 1fr;
+  }
+
+  .trace__ruler {
+    margin-left: 44%;
+  }
+
+  .decision a {
+    grid-template-columns: 1fr 5fr;
+  }
+
+  .decision__gist {
+    grid-column: 2;
+  }
+
+  .quickstart .terminal {
+    grid-column: 1 / -1;
+  }
+
+  .colophon {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .colophon > :last-child {
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-chisel] {
+    visibility: hidden;
+  }
+}

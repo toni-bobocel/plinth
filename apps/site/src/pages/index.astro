@@ -1,0 +1,289 @@
+---
+import '../styles/global.css'
+
+const repo = 'https://github.com/toni-bobocel/plinth'
+
+const rows = [
+  { org: 'acme', name: 'Rockets', id: '8f1c…a2' },
+  { org: 'globex', name: 'Doomsday device', id: '1b7e…09' },
+  { org: 'acme', name: 'Anvil logistics', id: 'c40d…5e' },
+  { org: 'globex', name: 'Volcano lair', id: '77aa…3c' },
+  { org: 'acme', name: 'Roadrunner traps', id: 'e912…f4' },
+  { org: 'globex', name: 'Weather machine', id: '0d3b…81' },
+]
+
+const courses = [
+  { numeral: 'I', name: 'Postgres 18', detail: 'row-level security · forced' },
+  { numeral: 'II', name: 'Kysely', detail: 'typed sql · no orm' },
+  { numeral: 'III', name: 'Hono', detail: 'routes · csrf · secure headers' },
+  { numeral: 'IV', name: 'Sessions', detail: 'argon2id · __host- cookie' },
+  { numeral: 'V', name: 'OpenTelemetry', detail: 'http · pg · pino' },
+  { numeral: 'VI', name: 'Delivery', detail: 'ci · distroless · compose' },
+]
+
+// Illustrative timings, shaped like a warm local run.
+const spans = [
+  { kind: 'http', depth: 0, op: 'POST', name: '/orgs/:org/projects', start: 0, end: 9.8 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'BEGIN', start: 0.4, end: 0.7 },
+  { kind: 'scope', depth: 1, op: 'pg', name: "set_config('app.user_id')", start: 0.7, end: 1.1 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'select memberships ⋈ organizations', start: 1.1, end: 2.3 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'COMMIT', start: 2.3, end: 2.6 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'BEGIN', start: 2.9, end: 3.1 },
+  { kind: 'scope', depth: 1, op: 'pg', name: "set_config('app.org_id')", start: 3.1, end: 3.5 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'insert into projects', start: 3.5, end: 5.9 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'insert into audit_events', start: 5.9, end: 7.4 },
+  { kind: 'pg', depth: 1, op: 'pg', name: 'COMMIT', start: 7.4, end: 8.9 },
+]
+const total = 10
+
+const decisions = [
+  {
+    numeral: 'I',
+    title: 'Record architecture decisions',
+    gist: 'Choices that look arbitrary get undone. Written down, they get argued with.',
+    file: '0001-record-architecture-decisions.md',
+  },
+  {
+    numeral: 'II',
+    title: 'Tenant isolation with row-level security',
+    gist: 'Shared tables, guarantee moved into Postgres. A missing scope returns zero rows.',
+    file: '0002-tenancy-with-rls.md',
+  },
+  {
+    numeral: 'III',
+    title: 'Typed SQL with Kysely, no ORM',
+    gist: 'The interesting code is in Postgres. Nothing should hide it.',
+    file: '0003-sql-first-with-kysely.md',
+  },
+  {
+    numeral: 'IV',
+    title: 'Opaque sessions over JWTs',
+    gist: 'Revocable, unreadable by scripts, hashed at rest.',
+    file: '0004-opaque-session-cookies.md',
+  },
+]
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plinth — tenant isolation enforced by Postgres</title>
+    <meta
+      name="description"
+      content="A foundation for multi-tenant products: row-level security, typed SQL, opaque sessions, OpenTelemetry, CI and a distroless image."
+    />
+    <meta name="theme-color" content="#e7e1d5" />
+    <link rel="icon" href={`${import.meta.env.BASE_URL}favicon.svg`} type="image/svg+xml" />
+  </head>
+  <body>
+    <header class="masthead mono">
+      <a class="seal" href="#top">PLINTH</a>
+      <span>MMXXVI</span>
+      <a href={repo}>Source ↗</a>
+    </header>
+
+    <div id="smooth-wrapper">
+      <div id="smooth-content">
+        <main id="top">
+          <section class="hero">
+            <h1 class="hero__word carved" data-chisel>PLINTH</h1>
+            <p class="hero__inscription" data-inscription>
+              A<span class="interpunct">·</span>FOUNDATION<span class="interpunct">·</span>FOR<span
+                class="interpunct">·</span
+              >PRODUCTS<span class="interpunct">·</span>WITH<span class="interpunct">·</span>MANY<span
+                class="interpunct">·</span
+              >TENANTS
+            </p>
+            <p class="hero__lede" data-rise>
+              Tenant isolation enforced by Postgres, <em>not by remembering a where clause.</em>{' '}
+              Sessions, tracing, delivery, each decided and written down before the first feature.
+            </p>
+            <ul class="hero__meta mono" data-rise>
+              <li><span>Database</span><span>Postgres 18 · RLS</span></li>
+              <li><span>Service</span><span>Hono · Kysely</span></li>
+              <li><span>Telemetry</span><span>OpenTelemetry</span></li>
+              <li><span>Workspace</span><span>pnpm · Turborepo</span></li>
+            </ul>
+          </section>
+
+          <section class="chapter" id="clause">
+            <header class="chapter__head">
+              <span class="chapter__numeral carved">I</span>
+              <h2 class="chapter__title">The query has no filter. <em>Postgres adds one.</em></h2>
+              <p class="chapter__aside">
+                The API connects as a role that owns nothing. Every tenant-owned table carries a
+                forced policy on a transaction-local setting.
+              </p>
+            </header>
+
+            <div class="clause" data-clause>
+              <div class="terminal">
+                <div class="terminal__label"><span>apps/api</span><span>no where clause</span></div>
+                <pre><span class="k">await</span> db.selectFrom(<span class="s">'projects'</span>)
+  .selectAll()
+  .execute()</pre>
+                <span class="scope" data-scope>
+                  <span data-scope-text>app.org_id = <b>unset</b></span>
+                </span>
+              </div>
+
+              <div class="tablet">
+                {
+                  rows.map((row) => (
+                    <div class="tablet__row" data-org={row.org}>
+                      <span class="mono">{row.org}</span>
+                      <span class="name">{row.name}</span>
+                      <span class="mono">{row.id}</span>
+                      <svg class="tablet__strike" viewBox="0 0 100 14" preserveAspectRatio="none" aria-hidden="true">
+                        <path d="M0 8 C 18 5, 34 10, 52 7 S 84 5, 100 8" />
+                      </svg>
+                    </div>
+                  ))
+                }
+                <div class="tablet__count">
+                  <span class="mono">rows returned</span>
+                  <strong data-count>6</strong>
+                </div>
+              </div>
+
+              <p class="verdict" data-verdict></p>
+            </div>
+          </section>
+
+          <section class="chapter" id="strata">
+            <header class="chapter__head">
+              <span class="chapter__numeral carved">II</span>
+              <h2 class="chapter__title">Six courses, <em>laid before the first feature.</em></h2>
+              <p class="chapter__aside">
+                Each layer is the boring, correct default. The column on top is whatever you are
+                actually building.
+              </p>
+            </header>
+
+            <div class="strata" data-strata>
+              <div class="plinth">
+                {
+                  courses.map((c) => (
+                    <div class="course">
+                      <span class="course__numeral">{c.numeral}</span>
+                      <span class="course__name">{c.name.toUpperCase()}</span>
+                      <span class="course__detail mono">{c.detail}</span>
+                    </div>
+                  ))
+                }
+                <svg class="shaft" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  <path class="shaft__edge" d="M10 100 C 10.6 62, 12.2 30, 14 0" />
+                  <path class="shaft__edge" d="M90 100 C 89.4 62, 87.8 30, 86 0" />
+                  <path class="shaft__flute" d="M26 100 C 26.4 62, 27.4 30, 28.4 0" />
+                  <path class="shaft__flute" d="M42 100 C 42.2 62, 42.6 30, 43 0" />
+                  <path class="shaft__flute" d="M58 100 C 57.8 62, 57.4 30, 57 0" />
+                  <path class="shaft__flute" d="M74 100 C 73.6 62, 72.6 30, 71.6 0" />
+                </svg>
+                <span class="shaft__label" data-shaft-label>your product</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="chapter" id="trace">
+            <header class="chapter__head">
+              <span class="chapter__numeral carved">III</span>
+              <h2 class="chapter__title">One request, <em>end to end.</em></h2>
+              <p class="chapter__aside">
+                Spans are named after the matched route, not the URL, and every log line carries the
+                trace id. The red spans are tenant scoping.
+              </p>
+            </header>
+
+            <div class="trace" data-trace>
+              <div class="trace__header">
+                <span class="trace__route">POST /orgs/:org/projects</span>
+                <span class="mono">trace 4b69515a…94e6 · 201</span>
+              </div>
+              <div class="trace__ruler mono">
+                {[0, 2, 4, 6, 8, 10].map((t) => <span style={`left:${(t / total) * 100}%`}>{t} ms</span>)}
+              </div>
+              {
+                spans.map((s) => (
+                  <div class="span" data-kind={s.kind} data-depth={s.depth}>
+                    <span class="span__name mono">
+                      <i>{s.op}</i>
+                      {s.name}
+                    </span>
+                    <span class="span__track">
+                      <span
+                        class="span__bar"
+                        style={`left:${(s.start / total) * 100}%;width:${((s.end - s.start) / total) * 100}%`}
+                      />
+                      <span class="span__ms mono" style={`left:${(s.end / total) * 100}%`}>
+                        {(s.end - s.start).toFixed(1)}
+                      </span>
+                    </span>
+                  </div>
+                ))
+              }
+              <div class="trace__log" data-log>
+                {'{'}"level":30,<mark>"trace_id":"4b69515a2174273f3191d0b763b594e6"</mark>,"span_id":"13980492f5eb567f","method":"POST","route":"/orgs/:org/projects","status":201,"ms":10{'}'}
+              </div>
+            </div>
+          </section>
+
+          <section class="chapter" id="decisions">
+            <header class="chapter__head">
+              <span class="chapter__numeral carved">IV</span>
+              <h2 class="chapter__title">Decisions, <em>on the record.</em></h2>
+              <p class="chapter__aside">
+                Short architecture decision records. Never edited once accepted, only superseded.
+              </p>
+            </header>
+
+            <ol class="decisions">
+              {
+                decisions.map((d) => (
+                  <li class="decision">
+                    <a href={`${repo}/blob/main/docs/adr/${d.file}`}>
+                      <span class="decision__numeral">{d.numeral}</span>
+                      <span class="decision__title">{d.title}</span>
+                      <span class="decision__gist">{d.gist}</span>
+                      <span class="decision__rule" />
+                    </a>
+                  </li>
+                ))
+              }
+            </ol>
+          </section>
+
+          <section class="chapter" id="lay">
+            <header class="chapter__head">
+              <span class="chapter__numeral carved">V</span>
+              <h2 class="chapter__title">Lay it <em>yourself.</em></h2>
+              <p class="chapter__aside">Postgres, migrations, the API and Jaeger in one command.</p>
+            </header>
+            <div class="quickstart">
+              <div class="terminal">
+                <div class="terminal__label"><span>shell</span><span>docker compose</span></div>
+                <pre>git clone {repo}
+cd plinth
+docker compose up --build
+
+<span class="k">curl</span> localhost:8787/healthz    <span class="s"># ok</span>
+<span class="k">open</span> http://localhost:16686    <span class="s"># traces</span></pre>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer class="colophon mono">
+          <p>Set in Marcellus, Newsreader &amp; Martian Mono</p>
+          <p class="colophon__mark">PLINTH</p>
+          <p><a href={repo}>github.com/toni-bobocel/plinth</a></p>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      import '../scripts/main.ts'
+    </script>
+  </body>
+</html>
