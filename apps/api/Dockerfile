@@ -1,5 +1,5 @@
 # Build from the repository root: docker build -f apps/api/Dockerfile .
-FROM node:24-slim AS build
+FROM node:25-slim AS build
 RUN npm install --global pnpm@12.23.0
 WORKDIR /src
 
