@@ -14,3 +14,7 @@ updates:
   - package-ecosystem: docker
     directory: /apps/api
     schedule: { interval: monthly }
+    # Even-numbered Node majors only: odd releases never reach LTS.
+    ignore:
+      - dependency-name: node
+        update-types: [version-update:semver-major]

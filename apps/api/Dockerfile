@@ -2,13 +2,9 @@
 FROM node:24-slim AS build
 RUN npm install --global pnpm@12.23.0
 WORKDIR /src
-
-# Lockfile-only layer: dependency download is cached until the lockfile moves.
-COPY pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm fetch
-
 COPY . .
-RUN pnpm install --offline --frozen-lockfile --filter @plinth/api... \
+RUN --mount=type=cache,id=pnpm-store,target=/root/.local/share/pnpm/store \
+    pnpm install --frozen-lockfile --filter @plinth/api... \
  && pnpm --filter @plinth/api... build \
  && pnpm --filter @plinth/api deploy --prod --legacy /out
 

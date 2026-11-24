@@ -61,7 +61,7 @@ jobs:
           MIGRATION_DATABASE_URL: postgres://plinth:plinth@localhost:5432/plinth
       - name: plinth_app sees nothing without a tenant
         run: |
-          count=$(psql -h localhost -U plinth -d plinth -tAc "set role plinth_app; select count(*) from projects")
+          count=$(psql -h localhost -U plinth -d plinth -qtAc "set role plinth_app; select count(*) from projects")
           test "$count" = "0"
 
   image:
