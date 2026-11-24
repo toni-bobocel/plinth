@@ -1,0 +1,42 @@
+name: plinth
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: plinth
+      POSTGRES_PASSWORD: plinth
+      POSTGRES_DB: plinth
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./infra/postgres-init.sql:/docker-entrypoint-initdb.d/00-roles.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "plinth"]
+      interval: 2s
+      retries: 15
+
+  migrate:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    command: ["node_modules/@plinth/db/dist/migrate.js"]
+    environment:
+      MIGRATION_DATABASE_URL: postgres://plinth:plinth@postgres:5432/plinth
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    ports: ["8787:8787"]
+    environment:
+      DATABASE_URL: postgres://plinth_app:plinth_app@postgres:5432/plinth
+      OTEL_SERVICE_NAME: plinth-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  jaeger:
+    image: jaegertracing/jaeger:2.23.0
+    ports: ["16686:16686"]
+
+volumes:
+  pgdata:
